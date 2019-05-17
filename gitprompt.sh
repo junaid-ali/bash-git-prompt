@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+OLD_PS="\[\e[38;5;245m\]\u\[\e[00m\]@\[\e[38;5;172m\]\h\[\e[00m\]:\[\e[38;5;5m\]\w\[\e[00m\]"
+
 function async_run() {
   {
     eval "$@" &> /dev/null
@@ -270,6 +272,8 @@ function git_prompt_config() {
     fi
   fi
 
+  PROMPT_START=$OLD_PS
+
   # set GIT_PROMPT_LEADING_SPACE to 0 if you want to have no leading space in front of the GIT prompt
   if [[ "${GIT_PROMPT_LEADING_SPACE:-1}" = "0" ]]; then
     PROMPT_LEADING_SPACE=""
@@ -280,7 +284,7 @@ function git_prompt_config() {
   if [[ "${GIT_PROMPT_ONLY_IN_REPO:-0}" == 1 ]]; then
     EMPTY_PROMPT="${OLD_GITPROMPT}"
   elif [[ "${GIT_PROMPT_WITH_VIRTUAL_ENV:-1}" == 1 ]]; then
-    local ps="$(gp_add_virtualenv_to_prompt)${PROMPT_START}$(${prompt_callback})${PROMPT_END}"
+    local ps="$(gp_add_virtualenv_to_prompt)${PROMPT_START}$(${prompt_callback}#${PROMPT_END})"
     EMPTY_PROMPT="${ps//_LAST_COMMAND_INDICATOR_/${LAST_COMMAND_INDICATOR}}"
   else
     local ps="${PROMPT_START}$(${prompt_callback})${PROMPT_END}"
@@ -486,6 +490,9 @@ function updatePrompt() {
   local Blue="\[\033[0;34m\]"
 
   git_prompt_config
+
+  PROMP_START=$OLD_PS
+  PROMPT_END=" $ "
 
   __GIT_PROMPT_IGNORE_STASH="${GIT_PROMPT_IGNORE_STASH:-0}"
   __GIT_PROMPT_SHOW_UPSTREAM="${GIT_PROMPT_SHOW_UPSTREAM:-0}"
